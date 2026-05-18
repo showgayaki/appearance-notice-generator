@@ -2,17 +2,17 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { isLoginConfigured, isSupabaseConfigured, loginEmail, loginId, supabase } from "./lib/supabase";
 import type {
-  Appearance,
-  AppearanceInput,
-  GeneratedAppearance,
-  PeriodHeader,
-  PeriodHeaderInput,
+  GeneratedProgram,
+  GuestProgram,
+  GuestProgramInput,
+  PostHeader,
+  PostHeaderInput,
   ProgramInput,
   RegularProgram,
   Weekday,
 } from "./types";
 import { getDefaultEndYmd, getTodayYmd, getWeekdayLabel } from "./utils/date";
-import { buildGeneratedAppearances, findPeriodTitle, generateAppearanceText } from "./utils/generateText";
+import { buildGeneratedPrograms, findPostTitle, generateProgramText } from "./utils/generateText";
 
 const emptyRegularProgram: ProgramInput = {
   weekday: 1,
@@ -23,17 +23,15 @@ const emptyRegularProgram: ProgramInput = {
   is_active: true,
 };
 
-const emptyAppearance = (): AppearanceInput => ({
-  appearance_date: getTodayYmd(),
+const emptyGuestProgram = (): GuestProgramInput => ({
+  program_date: getTodayYmd(),
   start_time: "",
   end_time: "",
   station_name: "",
   program_name: "",
 });
 
-const emptyPeriodHeader = (): PeriodHeaderInput => ({
-  start_date: getTodayYmd(),
-  end_date: getDefaultEndYmd(),
+const emptyPostHeader = (): PostHeaderInput => ({
   title: "🌈今週テレビ🌈",
 });
 
@@ -50,8 +48,8 @@ const requireText = (value: string): string => value.trim();
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [regularPrograms, setRegularPrograms] = useState<RegularProgram[]>([]);
-  const [appearances, setAppearances] = useState<Appearance[]>([]);
-  const [periodHeaders, setPeriodHeaders] = useState<PeriodHeader[]>([]);
+  const [guestPrograms, setGuestPrograms] = useState<GuestProgram[]>([]);
+  const [postHeaders, setPostHeaders] = useState<PostHeader[]>([]);
   const [startDate, setStartDate] = useState(getTodayYmd);
   const [endDate, setEndDate] = useState(getDefaultEndYmd);
   const [generatedText, setGeneratedText] = useState("");
@@ -62,8 +60,8 @@ export default function App() {
   const isLoggedIn = session !== null;
 
   const generatedItems = useMemo(
-    () => buildGeneratedAppearances(regularPrograms, appearances, startDate, endDate),
-    [regularPrograms, appearances, startDate, endDate],
+    () => buildGeneratedPrograms(regularPrograms, guestPrograms, startDate, endDate),
+    [regularPrograms, guestPrograms, startDate, endDate],
   );
 
   useEffect(() => {
@@ -92,29 +90,29 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const title = findPeriodTitle(periodHeaders, startDate, endDate);
-    setGeneratedText(generateAppearanceText(title, generatedItems));
-  }, [generatedItems, periodHeaders, startDate, endDate]);
+    const title = findPostTitle(postHeaders);
+    setGeneratedText(generateProgramText(title, generatedItems));
+  }, [generatedItems, postHeaders]);
 
   const loadData = async () => {
     setLoading(true);
     setMessage("");
 
-    const [regularResult, appearanceResult, headerResult] = await Promise.all([
+    const [regularResult, guestResult, headerResult] = await Promise.all([
       supabase.from("regular_programs").select("*").order("weekday").order("start_time").returns<RegularProgram[]>(),
-      supabase.from("appearances").select("*").order("appearance_date").order("start_time").returns<Appearance[]>(),
-      supabase.from("period_headers").select("*").order("start_date").returns<PeriodHeader[]>(),
+      supabase.from("guest_programs").select("*").order("program_date").order("start_time").returns<GuestProgram[]>(),
+      supabase.from("post_headers").select("*").order("created_at").returns<PostHeader[]>(),
     ]);
 
-    if (regularResult.error || appearanceResult.error || headerResult.error) {
+    if (regularResult.error || guestResult.error || headerResult.error) {
       setMessage("データの読み込みに失敗しました。Supabase設定とRLSを確認してください。");
       setLoading(false);
       return;
     }
 
     setRegularPrograms(regularResult.data);
-    setAppearances(appearanceResult.data);
-    setPeriodHeaders(headerResult.data);
+    setGuestPrograms(guestResult.data);
+    setPostHeaders(headerResult.data);
     setLoading(false);
   };
 
@@ -173,15 +171,13 @@ export default function App() {
         {copyStatus && <p className="status">{copyStatus}</p>}
       </section>
 
-      <PublicAppearances items={generatedItems} loading={loading} />
+      <PublicPrograms items={generatedItems} loading={loading} />
 
       {isLoggedIn && (
         <AdminPanel
-          appearances={appearances}
-          periodHeaders={periodHeaders}
+          guestPrograms={guestPrograms}
+          postHeaders={postHeaders}
           regularPrograms={regularPrograms}
-          selectedEndDate={endDate}
-          selectedStartDate={startDate}
           onChanged={() => void loadData()}
         />
       )}
@@ -258,7 +254,7 @@ function AuthPanel({ isLoggedIn, onLoggedOut }: { isLoggedIn: boolean; onLoggedO
   );
 }
 
-function PublicAppearances({ items, loading }: { items: GeneratedAppearance[]; loading: boolean }) {
+function PublicPrograms({ items, loading }: { items: GeneratedProgram[]; loading: boolean }) {
   return (
     <section className="list-panel">
       <div className="section-heading">
@@ -300,18 +296,14 @@ function PublicAppearances({ items, loading }: { items: GeneratedAppearance[]; l
 }
 
 function AdminPanel({
-  appearances,
-  periodHeaders,
+  guestPrograms,
+  postHeaders,
   regularPrograms,
-  selectedEndDate,
-  selectedStartDate,
   onChanged,
 }: {
-  appearances: Appearance[];
-  periodHeaders: PeriodHeader[];
+  guestPrograms: GuestProgram[];
+  postHeaders: PostHeader[];
   regularPrograms: RegularProgram[];
-  selectedEndDate: string;
-  selectedStartDate: string;
   onChanged: () => void;
 }) {
   return (
@@ -319,13 +311,8 @@ function AdminPanel({
       <h2>管理</h2>
       <div className="admin-grid">
         <RegularProgramManager items={regularPrograms} onChanged={onChanged} />
-        <AppearanceManager items={appearances} onChanged={onChanged} />
-        <PeriodHeaderManager
-          items={periodHeaders}
-          onChanged={onChanged}
-          selectedEndDate={selectedEndDate}
-          selectedStartDate={selectedStartDate}
-        />
+        <GuestProgramManager items={guestPrograms} onChanged={onChanged} />
+        <PostHeaderManager items={postHeaders} onChanged={onChanged} />
       </div>
     </section>
   );
@@ -454,31 +441,31 @@ function RegularProgramManager({ items, onChanged }: { items: RegularProgram[]; 
   );
 }
 
-function AppearanceManager({ items, onChanged }: { items: Appearance[]; onChanged: () => void }) {
+function GuestProgramManager({ items, onChanged }: { items: GuestProgram[]; onChanged: () => void }) {
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<AppearanceInput>(emptyAppearance);
+  const [form, setForm] = useState<GuestProgramInput>(emptyGuestProgram);
   const [error, setError] = useState("");
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
 
-    const payload: AppearanceInput = {
-      appearance_date: form.appearance_date,
+    const payload: GuestProgramInput = {
+      program_date: form.program_date,
       start_time: requireText(form.start_time),
       end_time: requireText(form.end_time),
       station_name: requireText(form.station_name),
       program_name: requireText(form.program_name),
     };
 
-    if (!payload.appearance_date || !payload.start_time || !payload.end_time || !payload.station_name || !payload.program_name) {
+    if (!payload.program_date || !payload.start_time || !payload.end_time || !payload.station_name || !payload.program_name) {
       setError("未入力の項目があります。");
       return;
     }
 
     const result = editingId
-      ? await supabase.from("appearances").update(payload).eq("id", editingId)
-      : await supabase.from("appearances").insert(payload);
+      ? await supabase.from("guest_programs").update(payload).eq("id", editingId)
+      : await supabase.from("guest_programs").insert(payload);
 
     if (result.error) {
       setError("保存に失敗しました。");
@@ -486,14 +473,14 @@ function AppearanceManager({ items, onChanged }: { items: Appearance[]; onChange
     }
 
     setEditingId(null);
-    setForm(emptyAppearance());
+    setForm(emptyGuestProgram());
     onChanged();
   };
 
-  const edit = (item: Appearance) => {
+  const edit = (item: GuestProgram) => {
     setEditingId(item.id);
     setForm({
-      appearance_date: item.appearance_date,
+      program_date: item.program_date,
       start_time: item.start_time,
       end_time: item.end_time,
       station_name: item.station_name,
@@ -505,7 +492,7 @@ function AppearanceManager({ items, onChanged }: { items: Appearance[]; onChange
     if (!window.confirm("この単発出演を削除しますか？")) {
       return;
     }
-    const { error } = await supabase.from("appearances").delete().eq("id", id);
+    const { error } = await supabase.from("guest_programs").delete().eq("id", id);
     if (error) {
       setError("削除に失敗しました。");
       return;
@@ -519,7 +506,7 @@ function AppearanceManager({ items, onChanged }: { items: Appearance[]; onChange
       <form onSubmit={(event) => void submit(event)}>
         <label>
           日付
-          <input type="date" value={form.appearance_date} onChange={(event) => setForm({ ...form, appearance_date: event.target.value })} />
+          <input type="date" value={form.program_date} onChange={(event) => setForm({ ...form, program_date: event.target.value })} />
         </label>
         <div className="form-row">
           <label>
@@ -542,7 +529,7 @@ function AppearanceManager({ items, onChanged }: { items: Appearance[]; onChange
         <div className="button-row">
           <button type="submit">{editingId ? "更新" : "追加"}</button>
           {editingId && (
-            <button type="button" onClick={() => { setEditingId(null); setForm(emptyAppearance()); }}>
+            <button type="button" onClick={() => { setEditingId(null); setForm(emptyGuestProgram()); }}>
               キャンセル
             </button>
           )}
@@ -552,7 +539,7 @@ function AppearanceManager({ items, onChanged }: { items: Appearance[]; onChange
       <ItemList
         items={items.map((item) => ({
           id: item.id,
-          label: `${item.appearance_date} ${item.start_time}〜${item.end_time} ${item.station_name}「${item.program_name}」`,
+          label: `${item.program_date} ${item.start_time}〜${item.end_time} ${item.station_name}「${item.program_name}」`,
           muted: false,
           onEdit: () => edit(item),
           onDelete: () => void remove(item.id),
@@ -562,65 +549,47 @@ function AppearanceManager({ items, onChanged }: { items: Appearance[]; onChange
   );
 }
 
-function PeriodHeaderManager({
+function PostHeaderManager({
   items,
-  selectedEndDate,
-  selectedStartDate,
   onChanged,
 }: {
-  items: PeriodHeader[];
-  selectedEndDate: string;
-  selectedStartDate: string;
+  items: PostHeader[];
   onChanged: () => void;
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<PeriodHeaderInput>({
-    ...emptyPeriodHeader(),
-    start_date: selectedStartDate,
-    end_date: selectedEndDate,
-  });
+  const [form, setForm] = useState<PostHeaderInput>(emptyPostHeader);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (editingId === null) {
-      setForm((current) => ({ ...current, start_date: selectedStartDate, end_date: selectedEndDate }));
-    }
-  }, [editingId, selectedEndDate, selectedStartDate]);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
 
-    const payload: PeriodHeaderInput = {
-      start_date: form.start_date,
-      end_date: form.end_date,
+    const payload: PostHeaderInput = {
       title: requireText(form.title),
     };
 
-    if (!payload.start_date || !payload.end_date || !payload.title) {
+    if (!payload.title) {
       setError("未入力の項目があります。");
       return;
     }
 
     const result = editingId
-      ? await supabase.from("period_headers").update(payload).eq("id", editingId)
-      : await supabase.from("period_headers").insert(payload);
+      ? await supabase.from("post_headers").update(payload).eq("id", editingId)
+      : await supabase.from("post_headers").insert(payload);
 
     if (result.error) {
-      setError("保存に失敗しました。同じ期間の見出しが既にある場合は編集してください。");
+      setError("保存に失敗しました。");
       return;
     }
 
     setEditingId(null);
-    setForm({ ...emptyPeriodHeader(), start_date: selectedStartDate, end_date: selectedEndDate });
+    setForm(emptyPostHeader());
     onChanged();
   };
 
-  const edit = (item: PeriodHeader) => {
+  const edit = (item: PostHeader) => {
     setEditingId(item.id);
     setForm({
-      start_date: item.start_date,
-      end_date: item.end_date,
       title: item.title,
     });
   };
@@ -629,7 +598,7 @@ function PeriodHeaderManager({
     if (!window.confirm("この見出しを削除しますか？")) {
       return;
     }
-    const { error } = await supabase.from("period_headers").delete().eq("id", id);
+    const { error } = await supabase.from("post_headers").delete().eq("id", id);
     if (error) {
       setError("削除に失敗しました。");
       return;
@@ -639,18 +608,8 @@ function PeriodHeaderManager({
 
   return (
     <div className="manager">
-      <h3>期間別見出し</h3>
+      <h3>投稿見出し</h3>
       <form onSubmit={(event) => void submit(event)}>
-        <div className="form-row">
-          <label>
-            開始日
-            <input type="date" value={form.start_date} onChange={(event) => setForm({ ...form, start_date: event.target.value })} />
-          </label>
-          <label>
-            終了日
-            <input type="date" value={form.end_date} onChange={(event) => setForm({ ...form, end_date: event.target.value })} />
-          </label>
-        </div>
         <label>
           見出し
           <input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} />
@@ -662,7 +621,7 @@ function PeriodHeaderManager({
               type="button"
               onClick={() => {
                 setEditingId(null);
-                setForm({ ...emptyPeriodHeader(), start_date: selectedStartDate, end_date: selectedEndDate });
+                setForm(emptyPostHeader());
               }}
             >
               キャンセル
@@ -674,7 +633,7 @@ function PeriodHeaderManager({
       <ItemList
         items={items.map((item) => ({
           id: item.id,
-          label: `${item.start_date}〜${item.end_date} ${item.title}`,
+          label: item.title,
           muted: false,
           onEdit: () => edit(item),
           onDelete: () => void remove(item.id),

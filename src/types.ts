@@ -12,9 +12,9 @@ export type RegularProgram = {
   updated_at: string;
 };
 
-export type Appearance = {
+export type GuestProgram = {
   id: string;
-  appearance_date: string;
+  program_date: string;
   start_time: string;
   end_time: string;
   station_name: string;
@@ -23,10 +23,8 @@ export type Appearance = {
   updated_at: string;
 };
 
-export type PeriodHeader = {
+export type PostHeader = {
   id: string;
-  start_date: string;
-  end_date: string;
   title: string;
   created_at: string;
   updated_at: string;
@@ -41,26 +39,24 @@ export type ProgramInput = {
   is_active: boolean;
 };
 
-export type AppearanceInput = {
-  appearance_date: string;
+export type GuestProgramInput = {
+  program_date: string;
   start_time: string;
   end_time: string;
   station_name: string;
   program_name: string;
 };
 
-export type PeriodHeaderInput = {
-  start_date: string;
-  end_date: string;
+export type PostHeaderInput = {
   title: string;
 };
 
-export type GeneratedAppearance = {
+export type GeneratedProgram = {
   id: string;
   date: string;
   startTime: string;
   endTime: string;
   stationName: string;
   programName: string;
-  source: "regular" | "appearance";
+  source: "regular" | "guest";
 };

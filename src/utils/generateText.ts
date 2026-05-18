@@ -1,19 +1,19 @@
-import type { Appearance, GeneratedAppearance, PeriodHeader, RegularProgram } from "../types";
+import type { GeneratedProgram, GuestProgram, PostHeader, RegularProgram } from "../types";
 import { formatDisplayDate, getDatesInRange, getWeekday, timeToMinutes } from "./date";
 
 const defaultTitle = "🌈今週テレビ🌈";
 
-export const buildGeneratedAppearances = (
+export const buildGeneratedPrograms = (
   regularPrograms: RegularProgram[],
-  appearances: Appearance[],
+  guestPrograms: GuestProgram[],
   startDate: string,
   endDate: string,
-): GeneratedAppearance[] => {
+): GeneratedProgram[] => {
   const dates = getDatesInRange(startDate, endDate);
   const regularItems = dates.flatMap((date) =>
     regularPrograms
       .filter((program) => program.is_active && program.weekday === getWeekday(date))
-      .map<GeneratedAppearance>((program) => ({
+      .map<GeneratedProgram>((program) => ({
         id: `${program.id}-${date}`,
         date,
         startTime: program.start_time,
@@ -24,19 +24,19 @@ export const buildGeneratedAppearances = (
       })),
   );
 
-  const appearanceItems = appearances
-    .filter((appearance) => appearance.appearance_date >= startDate && appearance.appearance_date <= endDate)
-    .map<GeneratedAppearance>((appearance) => ({
-      id: appearance.id,
-      date: appearance.appearance_date,
-      startTime: appearance.start_time,
-      endTime: appearance.end_time,
-      stationName: appearance.station_name,
-      programName: appearance.program_name,
-      source: "appearance",
+  const guestItems = guestPrograms
+    .filter((program) => program.program_date >= startDate && program.program_date <= endDate)
+    .map<GeneratedProgram>((program) => ({
+      id: program.id,
+      date: program.program_date,
+      startTime: program.start_time,
+      endTime: program.end_time,
+      stationName: program.station_name,
+      programName: program.program_name,
+      source: "guest",
     }));
 
-  return [...regularItems, ...appearanceItems].sort((left, right) => {
+  return [...regularItems, ...guestItems].sort((left, right) => {
     if (left.date !== right.date) {
       return left.date.localeCompare(right.date);
     }
@@ -44,12 +44,11 @@ export const buildGeneratedAppearances = (
   });
 };
 
-export const findPeriodTitle = (headers: PeriodHeader[], startDate: string, endDate: string): string => {
-  const matched = headers.find((header) => header.start_date === startDate && header.end_date === endDate);
-  return matched?.title.trim() || defaultTitle;
+export const findPostTitle = (headers: PostHeader[]): string => {
+  return headers[0]?.title.trim() || defaultTitle;
 };
 
-export const generateAppearanceText = (title: string, items: GeneratedAppearance[]): string => {
+export const generateProgramText = (title: string, items: GeneratedProgram[]): string => {
   const blocks = items.map((item) => {
     const date = formatDisplayDate(item.date);
     return `${date}${item.startTime}〜${item.endTime}\n${item.stationName}「${item.programName}」`;
