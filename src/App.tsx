@@ -100,9 +100,13 @@ export default function App() {
     <main className="app-shell">
       <header className="page-header">
         <div>
-          <p className="eyebrow">wc-appearances</p>
           <h1>テレビ出演情報</h1>
         </div>
+        {isLoggedIn && (
+          <a className="admin-link" href="/admin">
+            管理画面
+          </a>
+        )}
         <AuthPanel isLoggedIn={isLoggedIn} onLoggedOut={() => setSession(null)} />
       </header>
 
