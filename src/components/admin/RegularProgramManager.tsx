@@ -3,6 +3,7 @@ import { FiEdit } from "react-icons/fi";
 import { deleteRegularProgram, saveRegularProgram } from "../../services/programs";
 import type { ProgramInput, RegularProgram, Weekday } from "../../types";
 import { getWeekdayLabel } from "../../utils/date";
+import { AdminConfirmModal } from "./AdminConfirmModal";
 import { AdminEditModal } from "./AdminEditModal";
 
 const emptyRegularProgram: ProgramInput = {
@@ -27,13 +28,25 @@ const requireText = (value: string): string => value.trim();
 type RegularProgramManagerProps = {
   items: RegularProgram[];
   onChanged: () => void;
+  onNotify: (message: string) => void;
 };
 
-export function RegularProgramManager({ items, onChanged }: RegularProgramManagerProps) {
+export function RegularProgramManager({ items, onChanged, onNotify }: RegularProgramManagerProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<ProgramInput>(emptyRegularProgram);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const editingItem = editingId ? items.find((item) => item.id === editingId) : undefined;
+  const hasChanges =
+    !editingId ||
+    !editingItem ||
+    form.weekday !== editingItem.weekday ||
+    requireText(form.start_time) !== editingItem.start_time ||
+    requireText(form.end_time) !== editingItem.end_time ||
+    requireText(form.station_name) !== editingItem.station_name ||
+    requireText(form.program_name) !== editingItem.program_name ||
+    form.is_active !== editingItem.is_active;
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -53,7 +66,9 @@ export function RegularProgramManager({ items, onChanged }: RegularProgramManage
     }
 
     try {
+      const isEditing = editingId !== null;
       await saveRegularProgram(payload, editingId ?? undefined);
+      onNotify(isEditing ? "レギュラー番組を更新しました" : "レギュラー番組を追加しました");
     } catch {
       setError("保存に失敗しました。");
       return;
@@ -87,12 +102,9 @@ export function RegularProgramManager({ items, onChanged }: RegularProgramManage
   };
 
   const remove = async (id: string) => {
-    if (!window.confirm("このレギュラー番組を削除しますか？")) {
-      return;
-    }
-
     try {
       await deleteRegularProgram(id);
+      onNotify("レギュラー番組を削除しました");
     } catch {
       setError("削除に失敗しました。");
       return;
@@ -100,6 +112,7 @@ export function RegularProgramManager({ items, onChanged }: RegularProgramManage
 
     setEditingId(null);
     setForm(emptyRegularProgram);
+    setIsConfirmModalOpen(false);
     setIsModalOpen(false);
     onChanged();
   };
@@ -187,17 +200,28 @@ export function RegularProgramManager({ items, onChanged }: RegularProgramManage
               />
               有効
             </label>
-            <div className="button-row">
-              <button type="submit">{editingId ? "更新" : "追加"}</button>
+            <div className="button-row admin-modal-actions">
               {editingId && (
-                <button type="button" onClick={() => void remove(editingId)}>
+                <button type="button" className="delete-outline-button" onClick={() => setIsConfirmModalOpen(true)}>
                   削除
                 </button>
               )}
+              <button type="submit" disabled={editingId !== null && !hasChanges}>
+                {editingId ? "更新" : "追加"}
+              </button>
             </div>
             {error && <p className="error">{error}</p>}
           </form>
         </AdminEditModal>
+      )}
+      {isConfirmModalOpen && editingId && (
+        <AdminConfirmModal
+          title="レギュラー番組を削除"
+          message="このレギュラー番組を削除します。元に戻せません。"
+          confirmLabel="削除する"
+          onConfirm={() => void remove(editingId)}
+          onClose={() => setIsConfirmModalOpen(false)}
+        />
       )}
     </div>
   );

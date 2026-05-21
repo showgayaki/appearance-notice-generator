@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 type GeneratedTextPanelProps = {
   generatedText: string;
   onGeneratedTextChange: (value: string) => void;
+  onNotify: (message: string) => void;
 };
 
-export function GeneratedTextPanel({ generatedText, onGeneratedTextChange }: GeneratedTextPanelProps) {
-  const [copyStatus, setCopyStatus] = useState("");
+export function GeneratedTextPanel({ generatedText, onGeneratedTextChange, onNotify }: GeneratedTextPanelProps) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
@@ -21,8 +21,7 @@ export function GeneratedTextPanel({ generatedText, onGeneratedTextChange }: Gen
 
   const copyText = async () => {
     await navigator.clipboard.writeText(generatedText);
-    setCopyStatus("コピーしました");
-    window.setTimeout(() => setCopyStatus(""), 1800);
+    onNotify("コピーしました");
   };
 
   return (
@@ -40,7 +39,6 @@ export function GeneratedTextPanel({ generatedText, onGeneratedTextChange }: Gen
         rows={1}
         aria-label="生成された出演情報テキスト"
       />
-      {copyStatus && <p className="status">{copyStatus}</p>}
     </section>
   );
 }

@@ -3,10 +3,11 @@ import { isLoginConfigured, loginEmail, loginId, supabase } from "../lib/supabas
 
 type AuthPanelProps = {
   isLoggedIn: boolean;
+  onLoggedIn: () => void;
   onLoggedOut: () => void;
 };
 
-export function AuthPanel({ isLoggedIn, onLoggedOut }: AuthPanelProps) {
+export function AuthPanel({ isLoggedIn, onLoggedIn, onLoggedOut }: AuthPanelProps) {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
@@ -45,6 +46,7 @@ export function AuthPanel({ isLoggedIn, onLoggedOut }: AuthPanelProps) {
     setUserId("");
     setIsOpen(false);
     setIsLoginModalOpen(false);
+    onLoggedIn();
   };
 
   const signOut = async () => {

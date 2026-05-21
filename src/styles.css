@@ -301,6 +301,43 @@ h3 {
   animation: modal-in 160ms ease-out;
 }
 
+.confirm-modal {
+  width: min(380px, 100%);
+}
+
+.confirm-message {
+  margin-bottom: 16px;
+  color: #4d5560;
+  line-height: 1.6;
+}
+
+.danger-button,
+button.danger-button[type="button"] {
+  border-color: #b42318;
+  color: #ffffff;
+  background: #b42318;
+}
+
+.danger-button:hover,
+button.danger-button[type="button"]:hover {
+  border-color: #96180f;
+  background: #96180f;
+}
+
+.delete-outline-button,
+button.delete-outline-button[type="button"] {
+  border-color: #b42318;
+  color: #b42318;
+  background: #ffffff;
+}
+
+.delete-outline-button:hover,
+button.delete-outline-button[type="button"]:hover {
+  color: #96180f;
+  border-color: #96180f;
+  background: #fff4f2;
+}
+
 @keyframes popover-in {
   from {
     opacity: 0;
@@ -329,6 +366,28 @@ h3 {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes snackbar-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes snackbar-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -8px);
   }
 }
 
@@ -382,6 +441,57 @@ h3 {
   color: #573b00;
   background: #fff7df;
   border-color: #ead593;
+}
+
+.snackbar {
+  position: fixed;
+  top: 72px;
+  left: 50%;
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(480px, calc(100vw - 24px));
+  border: 1px solid #b8dbc7;
+  border-radius: 8px;
+  padding: 10px 12px 10px 14px;
+  color: #17452b;
+  background: #ecfff3;
+  box-shadow: 0 12px 30px rgba(32, 33, 36, 0.16);
+  transform: translateX(-50%);
+  animation: snackbar-in 180ms ease-out both;
+}
+
+.snackbar-error {
+  border-color: #efc0ba;
+  color: #8f1d14;
+  background: #fff0ee;
+}
+
+.snackbar.is-closing {
+  animation: snackbar-out 220ms ease-in both;
+}
+
+.snackbar span {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+}
+
+.snackbar-close {
+  width: 28px;
+  min-height: 28px;
+  border-color: transparent;
+  border-radius: 4px;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.snackbar-close:hover {
+  background: rgba(23, 69, 43, 0.08);
 }
 
 .section-heading {
@@ -523,6 +633,16 @@ h3 {
   gap: 8px;
 }
 
+.admin-modal-actions {
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.confirm-actions {
+  justify-content: space-between;
+  gap: 14px;
+}
+
 .button-row.compact {
   flex-wrap: nowrap;
 }
@@ -578,6 +698,10 @@ h3 {
     gap: 16px;
     margin: -10px -10px 12px;
     padding: 10px;
+  }
+
+  .snackbar {
+    top: 58px;
   }
 
   .text-panel,

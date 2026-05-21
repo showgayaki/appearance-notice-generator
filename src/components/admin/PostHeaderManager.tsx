@@ -2,6 +2,7 @@ import { FormEvent, useState } from "react";
 import { FiEdit } from "react-icons/fi";
 import { deletePostHeader, savePostHeader } from "../../services/programs";
 import type { PostHeader, PostHeaderInput } from "../../types";
+import { AdminConfirmModal } from "./AdminConfirmModal";
 import { AdminEditModal } from "./AdminEditModal";
 
 const emptyPostHeader = (): PostHeaderInput => ({
@@ -13,13 +14,17 @@ const requireText = (value: string): string => value.trim();
 type PostHeaderManagerProps = {
   items: PostHeader[];
   onChanged: () => void;
+  onNotify: (message: string) => void;
 };
 
-export function PostHeaderManager({ items, onChanged }: PostHeaderManagerProps) {
+export function PostHeaderManager({ items, onChanged, onNotify }: PostHeaderManagerProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<PostHeaderInput>(emptyPostHeader);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const editingItem = editingId ? items.find((item) => item.id === editingId) : undefined;
+  const hasChanges = !editingId || !editingItem || requireText(form.title) !== editingItem.title;
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -35,7 +40,9 @@ export function PostHeaderManager({ items, onChanged }: PostHeaderManagerProps) 
     }
 
     try {
+      const isEditing = editingId !== null;
       await savePostHeader(payload, editingId ?? undefined);
+      onNotify(isEditing ? "投稿見出しを更新しました" : "投稿見出しを追加しました");
     } catch {
       setError("保存に失敗しました。");
       return;
@@ -64,12 +71,9 @@ export function PostHeaderManager({ items, onChanged }: PostHeaderManagerProps) 
   };
 
   const remove = async (id: string) => {
-    if (!window.confirm("この見出しを削除しますか？")) {
-      return;
-    }
-
     try {
       await deletePostHeader(id);
+      onNotify("投稿見出しを削除しました");
     } catch {
       setError("削除に失敗しました。");
       return;
@@ -77,6 +81,7 @@ export function PostHeaderManager({ items, onChanged }: PostHeaderManagerProps) 
 
     setEditingId(null);
     setForm(emptyPostHeader());
+    setIsConfirmModalOpen(false);
     setIsModalOpen(false);
     onChanged();
   };
@@ -122,17 +127,28 @@ export function PostHeaderManager({ items, onChanged }: PostHeaderManagerProps) 
               見出し
               <input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} />
             </label>
-            <div className="button-row">
-              <button type="submit">{editingId ? "更新" : "追加"}</button>
+            <div className="button-row admin-modal-actions">
               {editingId && (
-                <button type="button" onClick={() => void remove(editingId)}>
+                <button type="button" className="delete-outline-button" onClick={() => setIsConfirmModalOpen(true)}>
                   削除
                 </button>
               )}
+              <button type="submit" disabled={editingId !== null && !hasChanges}>
+                {editingId ? "更新" : "追加"}
+              </button>
             </div>
             {error && <p className="error">{error}</p>}
           </form>
         </AdminEditModal>
+      )}
+      {isConfirmModalOpen && editingId && (
+        <AdminConfirmModal
+          title="投稿見出しを削除"
+          message="この投稿見出しを削除します。元に戻せません。"
+          confirmLabel="削除する"
+          onConfirm={() => void remove(editingId)}
+          onClose={() => setIsConfirmModalOpen(false)}
+        />
       )}
     </div>
   );
