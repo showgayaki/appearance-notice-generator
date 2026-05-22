@@ -24,6 +24,7 @@ export default function App() {
   const [startDate, setStartDate] = useState(getTodayYmd);
   const [endDate, setEndDate] = useState(getDefaultEndYmd);
   const [selectedPostHeaderId, setSelectedPostHeaderId] = useState("");
+  const [hasSelectedPostHeader, setHasSelectedPostHeader] = useState(false);
   const [selectedProgramIds, setSelectedProgramIds] = useState<Set<string>>(new Set());
   const [generatedText, setGeneratedText] = useState("");
   const [loading, setLoading] = useState(true);
@@ -92,10 +93,20 @@ export default function App() {
   }, [generatedItems]);
 
   useEffect(() => {
+    if (!hasSelectedPostHeader && !selectedPostHeaderId && postHeaders[0]) {
+      setSelectedPostHeaderId(postHeaders[0].id);
+      return;
+    }
+
     if (selectedPostHeaderId && !postHeaders.some((header) => header.id === selectedPostHeaderId)) {
       setSelectedPostHeaderId("");
     }
-  }, [postHeaders, selectedPostHeaderId]);
+  }, [hasSelectedPostHeader, postHeaders, selectedPostHeaderId]);
+
+  const selectPostHeader = (postHeaderId: string) => {
+    setHasSelectedPostHeader(true);
+    setSelectedPostHeaderId(postHeaderId);
+  };
 
   const generateSelectedText = () => {
     const selectedTitle = selectedPostHeaderId ? postHeaders.find((header) => header.id === selectedPostHeaderId)?.title.trim() ?? "" : "";
@@ -152,7 +163,7 @@ export default function App() {
             <PostHeaderSelect
               postHeaders={postHeaders}
               selectedPostHeaderId={selectedPostHeaderId}
-              onSelectedPostHeaderIdChange={setSelectedPostHeaderId}
+              onSelectedPostHeaderIdChange={selectPostHeader}
             />
 
             <PublicPrograms
