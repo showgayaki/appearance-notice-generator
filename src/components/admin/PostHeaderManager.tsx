@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { FiCheck } from "react-icons/fi";
 import { FiEdit } from "react-icons/fi";
 import { deletePostHeader, savePostHeader } from "../../services/programs";
@@ -31,7 +31,7 @@ export function PostHeaderManager({ items, onChanged, onNotify }: PostHeaderMana
   const hasChanges =
     !editingId || !editingItem || requireText(form.title) !== editingItem.title || form.is_default !== editingItem.is_default;
 
-  const submit = async (event: FormEvent<HTMLFormElement>) => {
+  const submit = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
 
     const payload: PostHeaderInput = {

@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { FiEdit } from "react-icons/fi";
 import { deleteExtraProgram, saveExtraProgram } from "../../services/programs";
 import type { ExtraProgram, ExtraProgramInput } from "../../types";
@@ -57,7 +57,7 @@ export function ExtraProgramManager({ items, onChanged, onNotify }: ExtraProgram
     requireText(form.station_name) !== editingItem.station_name ||
     requireText(form.program_name) !== editingItem.program_name;
 
-  const submit = async (event: FormEvent<HTMLFormElement>) => {
+  const submit = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
 
     const payload: ExtraProgramInput = {

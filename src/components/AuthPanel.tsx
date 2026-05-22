@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { isLoginConfigured, loginEmail, loginId, supabase } from "../lib/supabase";
 
 type AuthPanelProps = {
@@ -16,7 +16,7 @@ export function AuthPanel({ isLoggedIn, onLoggedIn, onLoggedOut }: AuthPanelProp
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const signIn = async (event: FormEvent<HTMLFormElement>) => {
+  const signIn = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
     setError("");
 

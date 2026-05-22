@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { FiEdit } from "react-icons/fi";
 import { deleteRegularProgram, saveRegularProgram } from "../../services/programs";
 import type { ProgramInput, RegularProgram } from "../../types";
@@ -58,7 +58,7 @@ export function RegularProgramManager({ items, onChanged, onNotify }: RegularPro
     requireText(form.program_name) !== editingItem.program_name ||
     form.is_active !== editingItem.is_active;
 
-  const submit = async (event: FormEvent<HTMLFormElement>) => {
+  const submit = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
 
     const payload: ProgramInput = {
