@@ -8,3 +8,4 @@ dist
 *.tsbuildinfo
 supabase/schema.sql
 supabase/seed.sql
+Supabase*.csv
