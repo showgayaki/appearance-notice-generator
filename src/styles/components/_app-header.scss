@@ -2,15 +2,19 @@
   position: sticky;
   top: 0;
   z-index: 15;
+  background: rgba(246, 247, 249, 0.96);
+  border-bottom: 1px solid #e2e6eb;
+  backdrop-filter: blur(10px);
+}
+
+.page-header-inner {
+  width: min(1120px, 100%);
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 32px;
-  margin: -16px -16px 18px;
   padding: 16px;
-  background: rgba(246, 247, 249, 0.96);
-  border-bottom: 1px solid #e2e6eb;
-  backdrop-filter: blur(10px);
 }
 
 h1,
@@ -44,15 +48,14 @@ h3 {
 }
 
 @media (max-width: 860px) {
-  .page-header {
+  .page-header-inner {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 560px) {
-  .page-header {
+  .page-header-inner {
     gap: 16px;
-    margin: -10px -10px 12px;
     padding: 10px;
   }
 }

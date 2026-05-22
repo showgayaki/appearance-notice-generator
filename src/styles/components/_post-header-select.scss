@@ -6,6 +6,40 @@
   background: #ffffff;
 }
 
+.post-header-react-select {
+  min-width: 0;
+}
+
+.post-header-react-select__control {
+  min-height: 38px;
+  border-color: #ccd3dc;
+  border-radius: 6px;
+  box-shadow: none;
+}
+
+.post-header-react-select__control:hover,
+.post-header-react-select__control--is-focused {
+  border-color: #1b4d89;
+}
+
+.post-header-react-select__value-container {
+  padding: 0 8px;
+}
+
+.post-header-react-select__indicator {
+  padding: 6px;
+}
+
+.post-header-react-select__menu {
+  overflow: hidden;
+  border: 1px solid #d9dfe7;
+  box-shadow: 0 14px 32px rgba(32, 33, 36, 0.18);
+}
+
+.post-header-react-select__menu-list {
+  max-height: 220px;
+}
+
 @media (max-width: 560px) {
   .header-select-panel {
     padding: 10px;

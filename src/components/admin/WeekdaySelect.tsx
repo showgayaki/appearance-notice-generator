@@ -35,8 +35,8 @@ export function WeekdaySelect({ value, onChange }: WeekdaySelectProps) {
   };
 
   return (
-    <label>
-      曜日
+    <div className="field-label">
+      <span>曜日</span>
       <Select<WeekdayOption, false>
         aria-label="曜日"
         blurInputOnSelect
@@ -52,6 +52,6 @@ export function WeekdaySelect({ value, onChange }: WeekdaySelectProps) {
         styles={selectStyles}
         value={selectedValue}
       />
-    </label>
+    </div>
   );
 }

@@ -184,7 +184,7 @@ export function RegularProgramManager({ items, onChanged, onNotify }: RegularPro
         <AdminEditModal title={editingId ? "レギュラー番組を編集" : "レギュラー番組を追加"} onClose={() => setIsModalOpen(false)}>
           <form className="admin-modal-form" onSubmit={(event) => void submit(event)}>
             <WeekdaySelect value={form.weekday} onChange={(weekday) => setForm({ ...form, weekday })} />
-            <div className="form-row">
+            <div className="time-form-row">
               <TimeSelect
                 error={fieldErrors.start_time}
                 errorKey={validationKey}
@@ -206,9 +206,10 @@ export function RegularProgramManager({ items, onChanged, onNotify }: RegularPro
                 }}
               />
             </div>
-            <label className="field-with-tooltip">
-              局
+            <div className="field-label field-with-tooltip">
+              <span>局</span>
               <input
+                aria-label="局"
                 value={form.station_name}
                 onChange={(event) => {
                   setForm({ ...form, station_name: event.target.value });
@@ -216,10 +217,11 @@ export function RegularProgramManager({ items, onChanged, onNotify }: RegularPro
                 }}
               />
               <FieldError message={fieldErrors.station_name} visibleKey={validationKey} />
-            </label>
-            <label className="field-with-tooltip">
-              番組名
+            </div>
+            <div className="field-label field-with-tooltip">
+              <span>番組名</span>
               <input
+                aria-label="番組名"
                 value={form.program_name}
                 onChange={(event) => {
                   setForm({ ...form, program_name: event.target.value });
@@ -227,15 +229,16 @@ export function RegularProgramManager({ items, onChanged, onNotify }: RegularPro
                 }}
               />
               <FieldError message={fieldErrors.program_name} visibleKey={validationKey} />
-            </label>
-            <label className="checkbox-label">
+            </div>
+            <div className="checkbox-label">
               <input
+                aria-label="有効"
                 checked={form.is_active}
                 onChange={(event) => setForm({ ...form, is_active: event.target.checked })}
                 type="checkbox"
               />
-              有効
-            </label>
+              <span>有効</span>
+            </div>
             <div className="button-row admin-modal-actions">
               {editingId && (
                 <button type="button" className="delete-outline-button" onClick={() => setIsConfirmModalOpen(true)}>

@@ -127,9 +127,10 @@ export function PostHeaderManager({ items, onChanged, onNotify }: PostHeaderMana
       {isModalOpen && (
         <AdminEditModal title={editingId ? "投稿見出しを編集" : "投稿見出しを追加"} onClose={() => setIsModalOpen(false)}>
           <form className="admin-modal-form" onSubmit={(event) => void submit(event)}>
-            <label className="field-with-tooltip">
-              見出し
+            <div className="field-label field-with-tooltip">
+              <span>見出し</span>
               <input
+                aria-label="見出し"
                 value={form.title}
                 onChange={(event) => {
                   setForm({ ...form, title: event.target.value });
@@ -137,7 +138,7 @@ export function PostHeaderManager({ items, onChanged, onNotify }: PostHeaderMana
                 }}
               />
               <FieldError message={titleError} visibleKey={validationKey} />
-            </label>
+            </div>
             <div className="button-row admin-modal-actions">
               {editingId && (
                 <button type="button" className="delete-outline-button" onClick={() => setIsConfirmModalOpen(true)}>

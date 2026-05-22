@@ -56,6 +56,16 @@
   width: 100%;
 }
 
+@media (min-width: 720px) {
+  .account-button,
+  .account-avatar {
+    width: 42px;
+    height: 42px;
+    min-height: 42px;
+    font-size: 1.34rem;
+  }
+}
+
 @keyframes popover-in {
   from {
     opacity: 0;

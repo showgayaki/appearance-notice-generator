@@ -72,7 +72,8 @@ textarea {
   line-height: 1.6;
 }
 
-label {
+label,
+.field-label {
   display: grid;
   gap: 5px;
   color: #4d5560;

@@ -180,9 +180,10 @@ export function GuestProgramManager({ items, onChanged, onNotify }: GuestProgram
       {isModalOpen && (
         <AdminEditModal title={editingId ? "ゲスト出演を編集" : "ゲスト出演を追加"} onClose={() => setIsModalOpen(false)}>
           <form className="admin-modal-form" onSubmit={(event) => void submit(event)}>
-            <label className="field-with-tooltip">
-              日付
+            <div className="field-label field-with-tooltip">
+              <span>日付</span>
               <input
+                aria-label="日付"
                 type="date"
                 value={form.program_date}
                 onChange={(event) => {
@@ -191,8 +192,8 @@ export function GuestProgramManager({ items, onChanged, onNotify }: GuestProgram
                 }}
               />
               <FieldError message={fieldErrors.program_date} visibleKey={validationKey} />
-            </label>
-            <div className="form-row">
+            </div>
+            <div className="time-form-row">
               <TimeSelect
                 error={fieldErrors.start_time}
                 errorKey={validationKey}
@@ -214,9 +215,10 @@ export function GuestProgramManager({ items, onChanged, onNotify }: GuestProgram
                 }}
               />
             </div>
-            <label className="field-with-tooltip">
-              局
+            <div className="field-label field-with-tooltip">
+              <span>局</span>
               <input
+                aria-label="局"
                 value={form.station_name}
                 onChange={(event) => {
                   setForm({ ...form, station_name: event.target.value });
@@ -224,10 +226,11 @@ export function GuestProgramManager({ items, onChanged, onNotify }: GuestProgram
                 }}
               />
               <FieldError message={fieldErrors.station_name} visibleKey={validationKey} />
-            </label>
-            <label className="field-with-tooltip">
-              番組名
+            </div>
+            <div className="field-label field-with-tooltip">
+              <span>番組名</span>
               <input
+                aria-label="番組名"
                 value={form.program_name}
                 onChange={(event) => {
                   setForm({ ...form, program_name: event.target.value });
@@ -235,7 +238,7 @@ export function GuestProgramManager({ items, onChanged, onNotify }: GuestProgram
                 }}
               />
               <FieldError message={fieldErrors.program_name} visibleKey={validationKey} />
-            </label>
+            </div>
             <div className="button-row admin-modal-actions">
               {editingId && (
                 <button type="button" className="delete-outline-button" onClick={() => setIsConfirmModalOpen(true)}>

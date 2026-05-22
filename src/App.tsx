@@ -104,7 +104,7 @@ export default function App() {
   };
 
   return (
-    <main className="app-shell">
+    <>
       <AppHeader
         isAdminPage={isAdminPage}
         isLoggedIn={isLoggedIn}
@@ -117,59 +117,61 @@ export default function App() {
 
       {snackbar && <Snackbar key={snackbar.id} snackbar={snackbar} onClose={() => setSnackbar(null)} />}
 
-      {!isSupabaseConfigured && (
-        <section className="notice">
-          <strong>Supabase設定が必要です。</strong>
-          <span>.env.localにVITE_SUPABASE_URLとVITE_SUPABASE_ANON_KEYを設定してください。</span>
-        </section>
-      )}
+      <main className="app-shell">
+        {!isSupabaseConfigured && (
+          <section className="notice">
+            <strong>Supabase設定が必要です。</strong>
+            <span>.env.localにVITE_SUPABASE_URLとVITE_SUPABASE_ANON_KEYを設定してください。</span>
+          </section>
+        )}
 
-      {message && <p className="notice">{message}</p>}
+        {message && <p className="notice">{message}</p>}
 
-      {isAdminPage ? (
-        <>
-          <h2 className="page-title">管理</h2>
-          {!isLoggedIn && <p className="notice">管理機能を使うには、右上のアイコンから管理者ログインしてください。</p>}
-          {isLoggedIn && (
-            <>
-              <PostHeaderManager items={postHeaders} onChanged={() => void loadData()} onNotify={showSnackbar} />
-              <RegularProgramManager items={regularPrograms} onChanged={() => void loadData()} onNotify={showSnackbar} />
-              <GuestProgramManager items={guestPrograms} onChanged={() => void loadData()} onNotify={showSnackbar} />
-            </>
-          )}
-        </>
-      ) : (
-        <>
-          <h2 className="page-title">作成</h2>
-          <DateRangeToolbar
-            startDate={startDate}
-            endDate={endDate}
-            onStartDateChange={setStartDate}
-            onEndDateChange={setEndDate}
-          />
+        {isAdminPage ? (
+          <>
+            <h2 className="page-title">管理</h2>
+            {!isLoggedIn && <p className="notice">管理機能を使うには、右上のアイコンから管理者ログインしてください。</p>}
+            {isLoggedIn && (
+              <>
+                <PostHeaderManager items={postHeaders} onChanged={() => void loadData()} onNotify={showSnackbar} />
+                <RegularProgramManager items={regularPrograms} onChanged={() => void loadData()} onNotify={showSnackbar} />
+                <GuestProgramManager items={guestPrograms} onChanged={() => void loadData()} onNotify={showSnackbar} />
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <h2 className="page-title">作成</h2>
+            <DateRangeToolbar
+              startDate={startDate}
+              endDate={endDate}
+              onStartDateChange={setStartDate}
+              onEndDateChange={setEndDate}
+            />
 
-          <PostHeaderSelect
-            postHeaders={postHeaders}
-            selectedPostHeaderId={selectedPostHeaderId}
-            onSelectedPostHeaderIdChange={setSelectedPostHeaderId}
-          />
+            <PostHeaderSelect
+              postHeaders={postHeaders}
+              selectedPostHeaderId={selectedPostHeaderId}
+              onSelectedPostHeaderIdChange={setSelectedPostHeaderId}
+            />
 
-          <PublicPrograms
-            items={generatedItems}
-            loading={loading}
-            selectedProgramIds={selectedProgramIds}
-            onSelectedProgramIdsChange={setSelectedProgramIds}
-          />
+            <PublicPrograms
+              items={generatedItems}
+              loading={loading}
+              selectedProgramIds={selectedProgramIds}
+              onSelectedProgramIdsChange={setSelectedProgramIds}
+            />
 
-          <div className="output-actions">
-            <button type="button" onClick={generateSelectedText} disabled={generatedItems.length === 0}>
-              出力
-            </button>
-          </div>
+            <div className="output-actions">
+              <button type="button" onClick={generateSelectedText} disabled={generatedItems.length === 0}>
+                出力
+              </button>
+            </div>
 
-          <GeneratedTextPanel generatedText={generatedText} onGeneratedTextChange={setGeneratedText} onNotify={showSnackbar} />
-        </>
-      )}
-    </main>
+            <GeneratedTextPanel generatedText={generatedText} onGeneratedTextChange={setGeneratedText} onNotify={showSnackbar} />
+          </>
+        )}
+      </main>
+    </>
   );
 }
