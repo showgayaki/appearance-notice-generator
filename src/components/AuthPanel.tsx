@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 import { isLoginConfigured, loginEmail, loginId, supabase } from "../lib/supabase";
 
 type AuthPanelProps = {
@@ -15,6 +16,7 @@ export function AuthPanel({ isLoggedIn, onLoggedIn, onLoggedOut }: AuthPanelProp
   const [isOpen, setIsOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const signIn = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
@@ -44,6 +46,7 @@ export function AuthPanel({ isLoggedIn, onLoggedIn, onLoggedOut }: AuthPanelProp
 
     setPassword("");
     setUserId("");
+    setShowPassword(false);
     setIsOpen(false);
     setIsLoginModalOpen(false);
     onLoggedIn();
@@ -115,23 +118,48 @@ export function AuthPanel({ isLoggedIn, onLoggedIn, onLoggedOut }: AuthPanelProp
       )}
 
       {isLoginModalOpen && (
-        <div className="modal-backdrop" role="presentation" onClick={() => setIsLoginModalOpen(false)}>
+        <div
+          className="modal-backdrop"
+          role="presentation"
+          onClick={() => {
+            setIsLoginModalOpen(false);
+            setShowPassword(false);
+          }}
+        >
           <div className="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-modal-title" onClick={(event) => event.stopPropagation()}>
             <div className="section-heading">
               <h2 id="login-modal-title">管理者ログイン</h2>
-              <button type="button" className="plain-button" onClick={() => setIsLoginModalOpen(false)}>
+              <button
+                type="button"
+                className="plain-button"
+                onClick={() => {
+                  setIsLoginModalOpen(false);
+                  setShowPassword(false);
+                }}
+              >
                 閉じる
               </button>
             </div>
             <form className="account-login-form" onSubmit={(event) => void signIn(event)}>
               <input value={userId} onChange={(event) => setUserId(event.target.value)} placeholder="ID" autoComplete="username" />
-              <input
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="PASS"
-                type="password"
-                autoComplete="current-password"
-              />
+              <div className="password-field">
+                <input
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="PASS"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  className="password-toggle-button"
+                  aria-label={showPassword ? "パスワードを隠す" : "パスワードを表示"}
+                  aria-pressed={showPassword}
+                  onClick={() => setShowPassword((current) => !current)}
+                >
+                  {showPassword ? <FiEyeOff aria-hidden="true" /> : <FiEye aria-hidden="true" />}
+                </button>
+              </div>
               <button type="submit" disabled={submitting}>
                 ログイン
               </button>

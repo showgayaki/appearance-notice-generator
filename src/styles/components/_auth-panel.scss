@@ -56,6 +56,34 @@
   width: 100%;
 }
 
+.password-field {
+  position: relative;
+  min-width: 0;
+}
+
+.password-field input {
+  padding-right: 42px;
+}
+
+.password-toggle-button {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  width: 32px;
+  min-height: 32px;
+  border-color: transparent;
+  padding: 0;
+  color: #5d6672;
+  background: transparent;
+  transform: translateY(-50%);
+}
+
+.password-toggle-button:hover,
+.password-toggle-button:focus-visible {
+  color: #1b4d89;
+  background: #eef4fb;
+}
+
 @media (min-width: 720px) {
   .account-button,
   .account-avatar {
