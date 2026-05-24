@@ -65,7 +65,7 @@
   padding-right: 42px;
 }
 
-.password-toggle-button {
+.password-field .password-toggle-button {
   position: absolute;
   top: 50%;
   right: 6px;
@@ -76,12 +76,6 @@
   color: #5d6672;
   background: transparent;
   transform: translateY(-50%);
-}
-
-.password-toggle-button:hover,
-.password-toggle-button:focus-visible {
-  color: #1b4d89;
-  background: #eef4fb;
 }
 
 @media (min-width: 720px) {
