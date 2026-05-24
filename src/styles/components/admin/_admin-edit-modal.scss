@@ -11,6 +11,7 @@
 
 .login-modal {
   width: min(360px, 100%);
+  min-width: 0;
   border: 1px solid #d9dfe7;
   border-radius: 8px;
   padding: 16px;
@@ -21,7 +22,26 @@
 
 .admin-modal-form {
   display: grid;
+  min-width: 0;
   gap: 12px;
+}
+
+.admin-modal-form .field-label {
+  min-width: 0;
+}
+
+.admin-modal-form input[type="date"] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.admin-modal-form input[type="date"]::-webkit-date-and-time-value {
+  min-width: 0;
+  text-align: left;
 }
 
 .admin-modal-actions {
