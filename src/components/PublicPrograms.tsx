@@ -1,4 +1,5 @@
 import type { GeneratedProgram } from "../types";
+import { formatDisplayDate } from "../utils/date";
 
 type PublicProgramsProps = {
   items: GeneratedProgram[];
@@ -12,6 +13,7 @@ const formatProgramName = (item: GeneratedProgram): string => {
   const suffix = item.titleSuffix?.trim();
   return suffix ? `${item.programName}（${suffix}）` : item.programName;
 };
+const formatSource = (item: GeneratedProgram): string => (item.source === "regular" ? "レギュラー" : "ゲスト・特番");
 
 export function PublicPrograms({ items, loading, selectedProgramIds, onSelectedProgramIdsChange }: PublicProgramsProps) {
   const toggleItem = (id: string) => {
@@ -37,18 +39,18 @@ export function PublicPrograms({ items, loading, selectedProgramIds, onSelectedP
           <table>
             <thead>
               <tr>
-                <th className="check-column">選択</th>
+                <th className="check-column sticky-select-column">選択</th>
+                <th className="source-column sticky-source-column">種別</th>
                 <th>日付</th>
                 <th>時間</th>
-                <th>局</th>
                 <th>番組名</th>
-                <th>種別</th>
+                <th>局</th>
               </tr>
             </thead>
             <tbody>
               {items.map((item) => (
                 <tr key={item.id}>
-                  <td className="check-column">
+                  <td className="check-column sticky-select-column">
                     <input
                       aria-label={`${item.programName}を出力対象にする`}
                       checked={selectedProgramIds.has(item.id)}
@@ -56,11 +58,13 @@ export function PublicPrograms({ items, loading, selectedProgramIds, onSelectedP
                       type="checkbox"
                     />
                   </td>
-                  <td>{item.date}</td>
+                  <td className="source-column sticky-source-column">
+                    <span className={`source-badge source-badge-${item.source}`}>{formatSource(item)}</span>
+                  </td>
+                  <td>{formatDisplayDate(item.date)}</td>
                   <td>{formatTime(item)}</td>
-                  <td>{item.stationName}</td>
                   <td>{formatProgramName(item)}</td>
-                  <td>{item.source === "regular" ? "レギュラー" : "ゲスト・特番"}</td>
+                  <td>{item.stationName}</td>
                 </tr>
               ))}
             </tbody>
