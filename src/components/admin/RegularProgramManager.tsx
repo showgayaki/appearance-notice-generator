@@ -152,7 +152,7 @@ export function RegularProgramManager({ items, onChanged, onNotify }: RegularPro
             <thead>
               <tr>
                 <th className="sticky-action-column"></th>
-                <th>曜日</th>
+                <th className="weekday-column">曜日</th>
                 <th>時間</th>
                 <th>局</th>
                 <th>番組名</th>
@@ -167,7 +167,7 @@ export function RegularProgramManager({ items, onChanged, onNotify }: RegularPro
                       <FiEdit aria-hidden="true" />
                     </button>
                   </td>
-                  <td>{getWeekdayLabel(item.weekday)}</td>
+                  <td className="weekday-column">{getWeekdayLabel(item.weekday)}</td>
                   <td>
                     {item.start_time}〜{item.end_time}
                   </td>
